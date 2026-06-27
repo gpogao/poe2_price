@@ -11,3 +11,11 @@ __pycache__/
 # 本地编辑器配置
 .vscode/
 .idea/
+特效补丁/output/
+特效补丁/tools/*.exe
+特效补丁/tools/*.dll
+特效补丁/tools/*.runtimeconfig.json
+特效补丁/tools/__pycache__/
+特效补丁/tools/oo2core.dll
+output/skill_effect_compare/
+agent/skill_effect/output/

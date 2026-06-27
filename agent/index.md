@@ -85,16 +85,32 @@ POE2 价格补丁工具是一个用于 Path of Exile 2（流亡黯道2）的物�
 | **源码** | `build/BundleExtractor/Program.cs` |
 | **发布** | `build/BundleExtractor/publish/BundleExtractor.exe` |
 
-### 3. Agent（AI 助手目录）
+### 3. 特效补丁（特效补丁）
+
+独立的特效简化工具，与物价补丁完全隔离。
+
+| 文件 | 说明 |
+|------|------|
+| **tools/update_effect_patch.ps1** | 一键更新/还原入口 |
+| **tools/poe2_skill_effect_patch.py** | 空壳 zip 生成 |
+| **tools/StripAoEffects.exe** | 清空 .ao 文件特效引用 |
+| **tools/PatchBundle3.exe** | 写入 ZZZZZZZZ/ bundle（修改版 LibBundle3） |
+| **empty_stubs/** | .pet/.epk/.trl 空壳模板（14/2/14 字节） |
+| **paths/** | 按 scope 分类的特效文件路径（来自易泥分析） |
+
+技术要点：修改了 `LibBundle3/Index.cs:651` 的 `CUSTOM_BUNDLE_BASE_PATH` 从 `"LibGGPK3/"` 改为 `"ZZZZZZZZ/"`，确保补丁 bundle 按字母序优先级最高。
+
+### 4. Agent（AI 助手目录）
 
 AI 助手学习项目结构和变更记录的专用目录。
 
 | 文件 | 说明 |
 |------|------|
 | **index.md** | 项目主索引文档，概述设计目的和架构模块 |
-| **模块子目录/** | 与 `index.md` 中的模块名称一一对应，存放变更记录 |
+| **skill_effect/** | 特效补丁设计文档和分析数据 |
+| **模块子目录/** | 变更记录 |
 
-### 4. build（构建工具目录）
+### 5. build（构建工具目录）
 
 发布打包相关的 C# 项目，用于生成独立 exe 启动器。
 
