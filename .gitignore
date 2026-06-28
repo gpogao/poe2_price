@@ -19,3 +19,7 @@ __pycache__/
 特效补丁/tools/oo2core.dll
 output/skill_effect_compare/
 agent/skill_effect/output/
+
+# AssetExtractor build output
+build/AssetExtractor/bin/
+build/AssetExtractor/obj/

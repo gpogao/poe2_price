@@ -133,21 +133,38 @@ A standalone tool (separate from `物价补丁/`) that simplifies POE2 skill vis
 
 ### Architecture
 ```
-特效补丁/tools/
-├── update_effect_patch.ps1     ← One-click update/restore
-├── effect_patch_common.ps1     ← Shared helpers (game detection, runtimes)
-├── poe2_skill_effect_patch.py   ← Generate empty stub zip (.pet/.epk/.trl)
-├── PatchBundle3.exe            ← Patched LibBundle3 (writes to ZZZZZZZZ/)
-└── StripAoEffects.exe          ← Strips ParticleEffects from .ao files
+特效补丁/
+├── tools/
+│   ├── update_effect_patch.ps1     ← One-click update/restore
+│   ├── effect_patch_common.ps1     ← Shared helpers (game detection, runtimes)
+│   ├── poe2_skill_effect_patch.py  ← Generate patch zip (stubs + assets)
+│   ├── PatchBundle3.exe            ← Patched LibBundle3 (writes to ZZZZZZZZ/)
+│   ├── StripAoEffects.exe          ← Strips ParticleEffects from .ao files
+│   └── extract_assets.ps1          ← Extract non-particle assets from 易泥
+├── assets/                         ← Pre-modified files for fog/viewdistance/minimap
+│   ├── fog/          (850 files: .env + bloom .hlsl)
+│   ├── viewdistance/ (1 file: character.ot)
+│   └── minimap/      (2 files: minimap .hlsl)
+├── empty_stubs/                    ← .pet/.epk/.trl empty templates
+├── paths/                          ← Particle path lists by scope
+└── output/
 ```
 
 ### Modification mechanism
 1. **`.ao` files**: `StripAoEffects.exe` empties `ParticleEffects`/`SoundEvents` blocks (UTF-16LE text parsing)
 2. **`.pet`/`.epk`/`.trl` files**: `poe2_skill_effect_patch.py` writes 2-14 byte stubs into a zip
 3. **`.bundle.bin` creation**: Modified `PatchBundle3.exe` (with `CUSTOM_BUNDLE_BASE_PATH = "ZZZZZZZZ/"` in `LibBundle3/Index.cs`) creates a bundle that sorts after `Tiny.V*` alphabetically for highest priority
+4. **Non-particle assets** (fog/viewdistance/minimap): Pre-modified files stored in `assets/<scope>/` are included verbatim in the patch zip. These are extracted from a 易泥-modified game state using `AssetExtractor` (build/) or `extract_assets.ps1`.
 
-### Key LibGGPK3 change
-`LibBundle3/Index.cs:651` — `CUSTOM_BUNDLE_BASE_PATH` changed from `"LibGGPK3/"` to `"ZZZZZZZZ/"` so the patched bundle has higher alphabetical priority than the original `Tiny.V*` bundles.
+### Scopes (8总)
+- **Particle (stub-based, 5)**: `all`, `spells`, `mtx`, `monsters`, `environment`, `other`
+- **Asset-based (3)**: `fog` (去除迷雾), `viewdistance` (调整视距 2x), `minimap` (小地图全开)
+- Asset scopes require pre-extracted files in `assets/<scope>/` before they can take effect.
+
+### Key changes from LibGGPK3
+- `LibBundle3/Index.cs:651` — `CUSTOM_BUNDLE_BASE_PATH` changed from `"LibGGPK3/"` to `"ZZZZZZZZ/"` for alphabetical priority over `Tiny.V*`
+- `LibGGPK3/Examples/StripAoEffects/` — Custom tool to empty ParticleEffects/SoundEvents blocks in .ao files
+- `build/AssetExtractor/` — NEW: batch extraction tool for pulling non-particle assets from modified game state
 
 ### Build
 ```powershell
@@ -156,6 +173,9 @@ dotnet publish LibGGPK3\Examples\PatchBundle3\PatchBundle3.csproj -c Release -r 
 
 # Build StripAoEffects
 dotnet publish LibGGPK3\Examples\StripAoEffects\StripAoEffects.csproj -c Release -r win-x64 --sc -p:PublishSingleFile=true
+
+# Build AssetExtractor (for extracting fog/viewdistance/minimap assets)
+dotnet publish build\AssetExtractor\AssetExtractor.csproj -c Release -r win-x64 --sc -p:PublishSingleFile=true
 ```
 
 ## Important constraints

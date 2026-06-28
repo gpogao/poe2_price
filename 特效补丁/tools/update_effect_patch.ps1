@@ -2,9 +2,17 @@
     [string]$Poe2Dir = "",
     [switch]$NoInstall,
     [switch]$Restore,
-    [ValidateSet("all", "spells", "mtx", "monsters", "environment", "other")]
     [string]$EffectScope = "all"
 )
+
+# Validate EffectScope (comma-separated, each token must be valid)
+$ValidScopes = @("all", "easyfarm", "spells", "mtx", "monsters", "environment", "other", "fog", "viewdistance", "minimap")
+foreach ($tok in $EffectScope -split ",") {
+    $t = $tok.Trim()
+    if ($t -and $t -notin $ValidScopes) {
+        throw "Invalid EffectScope '$t'. Valid values: $($ValidScopes -join ', ')"
+    }
+}
 
 $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -106,13 +114,12 @@ if (-not (Test-Path -LiteralPath $BackupIndex -PathType Leaf)) {
     Write-Host "已有索引备份，跳过" -ForegroundColor Green
 }
 
-# ── Strip .ao files in-place ──
+# ── Strip .ao files in-place (particle scopes only) ──
 $AoPathsFile = Join-Path $OutDir "ao_paths.txt"
 python3 -c @"
 import sys; sys.path.insert(0, r'$ToolsDir')
-from poe2_skill_effect_patch import _read_paths, _resolve_scopes
-paths = []
-scopes = _resolve_scopes(r'$EffectScope')
+from poe2_skill_effect_patch import _read_paths, _resolve_scopes, PARTICLE_SCOPES
+scopes = [s for s in _resolve_scopes(r'$EffectScope') if s in PARTICLE_SCOPES]
 paths = []
 for s in scopes:
     for p in _read_paths(s):

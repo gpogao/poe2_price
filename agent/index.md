@@ -91,14 +91,20 @@ POE2 价格补丁工具是一个用于 Path of Exile 2（流亡黯道2）的物�
 
 | 文件 | 说明 |
 |------|------|
-| **tools/update_effect_patch.ps1** | 一键更新/还原入口 |
-| **tools/poe2_skill_effect_patch.py** | 空壳 zip 生成 |
+| **tools/update_effect_patch.ps1** | 一键更新/还原入口（8个 scope） |
+| **tools/effect_patch_common.ps1** | 共享函数（游戏检测、运行时解析） |
+| **tools/poe2_skill_effect_patch.py** | 补丁 zip 生成（空壳 + 资产文件） |
 | **tools/StripAoEffects.exe** | 清空 .ao 文件特效引用 |
 | **tools/PatchBundle3.exe** | 写入 ZZZZZZZZ/ bundle（修改版 LibBundle3） |
+| **tools/extract_assets.ps1** | 从易泥提取 fog/viewdistance/minimap 资源 |
+| **assets/** | 预修改文件 (fog: 850, viewdistance: 1, minimap: 2) |
 | **empty_stubs/** | .pet/.epk/.trl 空壳模板（14/2/14 字节） |
 | **paths/** | 按 scope 分类的特效文件路径（来自易泥分析） |
 
-技术要点：修改了 `LibBundle3/Index.cs:651` 的 `CUSTOM_BUNDLE_BASE_PATH` 从 `"LibGGPK3/"` 改为 `"ZZZZZZZZ/"`，确保补丁 bundle 按字母序优先级最高。
+技术要点：
+- 修改了 `LibBundle3/Index.cs:651` 的 `CUSTOM_BUNDLE_BASE_PATH` 从 `"LibGGPK3/"` 改为 `"ZZZZZZZZ/"`，确保补丁 bundle 按字母序优先级最高
+- 8 个 scope：5 个粒子类 (spells/mtx/monsters/environment/other) + 3 个资产类 (fog/viewdistance/minimap)
+- 资产类 scope 对应易泥的 去除迷雾/调整视距/小地图全开，使用 `build/AssetExtractor` 提取
 
 ### 4. Agent（AI 助手目录）
 
@@ -117,6 +123,7 @@ AI 助手学习项目结构和变更记录的专用目录。
 | 项目 | 说明 |
 |------|------|
 | **BundleExtractor** | Steam 版 bundle 文件提取工具 |
+| **AssetExtractor** | 批量提取特效资产（fog/viewdistance/minimap） |
 | **PayloadPacker** | 加密 payload.zip → payload.enc（嵌入 exe） |
 | **Poe2PatchLauncher** | 独立 exe 启动器，解密并运行嵌入的脚本 |
 

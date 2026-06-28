@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="LibBundle3">
+      <HintPath>..\..\物价补丁\一键安装特殊补丁工具\LibBundle3.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="SystemExtensions">
+      <HintPath>..\..\物价补丁\一键安装特殊补丁工具\SystemExtensions.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\物价补丁\一键安装特殊补丁工具\oo2core.dll" Link="oo2core.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,2 @@
+shaders/minimap_blending_pixel.hlsl
+shaders/minimap_visibility_pixel.hlsl
